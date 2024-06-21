@@ -20,11 +20,10 @@ if (isset($_POST['email'])) {
 } else {
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
@@ -34,92 +33,44 @@ if (isset($_POST['email'])) {
 
   <!-- Bootstrap core CSS -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .login-form {
-      width: 340px;
-      margin: 50px auto;
-      font-size: 15px;
-    }
+  <link href = "style1.css" rel = "stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1ov7tLJXmzjv6i9fAqyWkM5YUc5wVgHbC6B5" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet"> -->
 
-    .login-form form {
-      margin-bottom: 15px;
-      background: #fff;
-      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-      padding: 30px;
-      border: 1px solid #ddd;
-    }
-
-    .login-form h2 {
-      color: #636363;
-      margin: 0 0 15px;
-      position: relative;
-      text-align: center;
-    }
-
-    .login-form h2:before,
-    .login-form h2:after {
-      content: "";
-      height: 2px;
-      width: 30%;
-      background: #d4d4d4;
-      position: absolute;
-      top: 50%;
-      z-index: 2;
-    }
-
-    .login-form h2:before {
-      left: 0;
-    }
-
-    .login-form h2:after {
-      right: 0;
-    }
-
-    .login-form .hint-text {
-      color: #999;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .login-form a:hover {
-      text-decoration: none;
-    }
-
-    .form-control,
-    .btn {
-      min-height: 38px;
-      border-radius: 2px;
-    }
-
-    .btn {
-      font-size: 15px;
-      font-weight: bold;
-    }
-  </style>
 </head>
 
 <body>
   <div class="login-form">
     <form action="" method="POST" autocomplete="off">
-      <h2 class="text-center">D.E.M.S</h2>
-      <p class="hint-text">Login Panel</p>
+      <h2 class="text-center">Login Panel</h2>
       <div class="form-group">
-        <input type="text" name="email" class="form-control" placeholder="Email" required="required">
+        <label for="email"> Email</label>
+        <!-- <i class="fa-thin fa-lock"></i> -->
+        <input type="text" id="email" name="email" class="form-control" placeholder="Email" required="required">
       </div>
       <div class="form-group">
-        <input type="password" name="password" class="form-control" placeholder="Password" required="required">
+        <label for="password"> Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required="required">
       </div>
       <div class="form-group">
-        <button type="submit" class="btn btn-success btn-block" style="border-radius:0%;">Login</button>
+        <button type="submit" class="btn btn-success btn-block">Login</button>
       </div>
-      <div class="clearfix">
-        <label class="float-left form-check-label"><input type="checkbox"> Remember me</label>
-        
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="rememberMe">
+        <label class="form-check-label" for="rememberMe">Remember me</label>
       </div>
     </form>
-    <p class="text-center">Don't have an account?<a href="register.php" class="text-danger"> Register Here</a></p>
+    <p class="text-center">Don't have an account? <a href="register.php" class="text-danger">Register Here</a></p>
   </div>
 </body>
+
+</html>
+</body>
+
+
+
 <!-- Bootstrap core JavaScript -->
 <script src="js/jquery.slim.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
