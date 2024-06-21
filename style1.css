@@ -86,3 +86,100 @@ body {
     text-decoration: none;
   }
   
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.938)); /* Background color */
+    /* font-family: 'Roboto', sans-serif; */
+  }
+  
+  .signup-form {
+    width: 500px; /* Adjust width to match login form */
+    background: #fff;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 18px; /* Adjust font size */
+    padding: 30px;
+    border: 1px solid #ddd;
+  }
+  
+  .signup-form h2 {
+    color: #636363;
+    margin: 0 0 15px;
+    position: relative;
+    text-align: center;
+    font-size: 28px; /* Increased font size */
+  }
+  
+  
+  .signup-form .hint-text {
+    color: #999;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .signup-form .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .signup-form .form-control {
+    height: 40px;
+    box-shadow: none;
+    color: #636363; /* Adjust text color to match theme */
+    border: none;
+    border-bottom: 2px solid #ccc; /* Change input style to underline */
+    border-radius: 0;
+    padding: 10px 5px;
+  }
+  
+  .signup-form .form-control:focus {
+    border-bottom-color: #5cb85c; /* Green underline on focus */
+    box-shadow: none;
+  }
+  
+  .signup-form input[type="checkbox"] {
+    margin-top: 3px;
+  }
+  
+  .signup-form .btn {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 140px;
+    border-radius: 20px; /* Curved corners */
+    transition: background-color 0.3s ease;
+    outline: none !important;
+  }
+  
+  .signup-form .btn:hover {
+    background-color: #c9302c; /* Hover effect */
+  }
+  
+  .signup-form .row div:first-child {
+    padding-right: 10px;
+  }
+  
+  .signup-form .row div:last-child {
+    padding-left: 10px;
+  }
+  
+  .signup-form a:hover {
+    text-decoration: none;
+  }
+  
+  .signup-form form a {
+    color: #5cb85c;
+    text-decoration: none;
+  }
+  
+  .signup-form form a:hover {
+    text-decoration: underline;
+  }
+  
+  .text-center a {
+    color: #007bff; /* Match link color */
+  }
+  
