@@ -5,38 +5,101 @@ $del = false;
 $expenseamount = "";
 $expensedate = date("Y-m-d");
 $expensecategory = "Entertainment";
+
+$projects_query = "SELECT project_id, project_name FROM projects";
+$projects_result = mysqli_query($con, $projects_query);
+
+
+// if (isset($_POST['add'])) {
+//     $expenseamount = $_POST['expenseamount'];
+//     $expensedate = $_POST['expensedate'];
+//     $expensecategory = $_POST['expensecategory'];
+
+//     $expenses = "INSERT INTO expenses (user_id, expense,expensedate,expensecategory) VALUES ('$userid', '$expenseamount','$expensedate','$expensecategory')";
+//     $result = mysqli_query($con, $expenses) or die("Something Went Wrong!");
+//     header('location: add_expense.php');
+// }
+
+// if (isset($_POST['update'])) {
+//     $id = $_GET['edit'];
+//     $expenseamount = $_POST['expenseamount'];
+//     $expensedate = $_POST['expensedate'];
+//     $expensecategory = $_POST['expensecategory'];
+
+//     $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory' WHERE user_id='$userid' AND expense_id='$id'";
+//     if (mysqli_query($con, $sql)) {
+//         echo "Records were updated successfully.";
+//     } else {
+//         echo "ERROR: Could not able to execute $sql. " . mysqli_error($con);
+//     }
+//     header('location: manage_expense.php');
+// }
+
+// if (isset($_POST['update'])) {
+//     $id = $_GET['edit'];
+//     $expenseamount = $_POST['expenseamount'];
+//     $expensedate = $_POST['expensedate'];
+//     $expensecategory = $_POST['expensecategory'];
+
+//     $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory' WHERE user_id='$userid' AND expense_id='$id'";
+//     if (mysqli_query($con, $sql)) {
+//         echo "Records were updated successfully.";
+//     } else {
+//         echo "ERROR: Could not able to execute $sql. " . mysqli_error($con);
+//     }
+//     header('location: manage_expense.php');
+// }
+
+// if (isset($_POST['delete'])) {
+//     $id = $_GET['delete'];
+//     $expenseamount = $_POST['expenseamount'];
+//     $expensedate = $_POST['expensedate'];
+//     $expensecategory = $_POST['expensecategory'];
+
+//     $sql = "DELETE FROM expenses WHERE user_id='$userid' AND expense_id='$id'";
+//     if (mysqli_query($con, $sql)) {
+//         echo "Records were updated successfully.";
+//     } else {
+//         echo "ERROR: Could not able to execute $sql. " . mysqli_error($con);
+//     }
+//     header('location: manage_expense.php');
+// }
+
+
 if (isset($_POST['add'])) {
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
     $expensecategory = $_POST['expensecategory'];
+    $project_id = $_POST['project_id'];
 
-    $expenses = "INSERT INTO expenses (user_id, expense,expensedate,expensecategory) VALUES ('$userid', '$expenseamount','$expensedate','$expensecategory')";
-    $result = mysqli_query($con, $expenses) or die("Something Went Wrong!");
-    header('location: add_expense.php');
-}
+    // Fetch the investment limit and current total expenses for the selected project
+    $query = "SELECT investment_limit FROM projects WHERE project_id = $project_id";
+    $project = mysqli_fetch_assoc(mysqli_query($con, $query));
 
-if (isset($_POST['update'])) {
-    $id = $_GET['edit'];
-    $expenseamount = $_POST['expenseamount'];
-    $expensedate = $_POST['expensedate'];
-    $expensecategory = $_POST['expensecategory'];
+    $query = "SELECT SUM(expense) AS total_expense FROM expenses WHERE project_id = $project_id";
+    $total_expense = mysqli_fetch_assoc(mysqli_query($con, $query))['total_expense'];
 
-    $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory' WHERE user_id='$userid' AND expense_id='$id'";
-    if (mysqli_query($con, $sql)) {
-        echo "Records were updated successfully.";
+    // Check if the new expense exceeds the investment limit
+    if (($total_expense + $expenseamount) > $project['investment_limit']) {
+        echo "Error: Adding this expense would exceed the project's investment limit.";
     } else {
-        echo "ERROR: Could not able to execute $sql. " . mysqli_error($con);
+        // Insert the new expense into the database
+        $expenses = "INSERT INTO expenses (user_id, expense, expensedate, expensecategory, project_id) VALUES ('$userid', '$expenseamount', '$expensedate', '$expensecategory', '$project_id')";
+        $result = mysqli_query($con, $expenses) or die("Something Went Wrong!");
+        header('location: add_expense.php');
     }
-    header('location: manage_expense.php');
 }
+
+// Existing update and delete logic...
 
 if (isset($_POST['update'])) {
     $id = $_GET['edit'];
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
     $expensecategory = $_POST['expensecategory'];
+    $project_id = $_POST['project_id'];
 
-    $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory' WHERE user_id='$userid' AND expense_id='$id'";
+    $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory', project_id='$project_id' WHERE user_id='$userid' AND expense_id='$id'";
     if (mysqli_query($con, $sql)) {
         echo "Records were updated successfully.";
     } else {
@@ -47,18 +110,15 @@ if (isset($_POST['update'])) {
 
 if (isset($_POST['delete'])) {
     $id = $_GET['delete'];
-    $expenseamount = $_POST['expenseamount'];
-    $expensedate = $_POST['expensedate'];
-    $expensecategory = $_POST['expensecategory'];
-
     $sql = "DELETE FROM expenses WHERE user_id='$userid' AND expense_id='$id'";
     if (mysqli_query($con, $sql)) {
-        echo "Records were updated successfully.";
+        echo "Records were deleted successfully.";
     } else {
         echo "ERROR: Could not able to execute $sql. " . mysqli_error($con);
     }
     header('location: manage_expense.php');
 }
+
 
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
@@ -172,6 +232,21 @@ if (isset($_GET['delete'])) {
 
                     <div class="col-md" style="margin:0 auto;">
                         <form action="" method="POST">
+
+                        <!-- project fetchingg -->
+                            <div class="form-group row">
+                                <label for="project_id" class="col-sm-6 col-form-label"><b>Select Project</b></label>
+                                <div class="col-md-6">
+                                    <select name="project_id" id="project_id" class="form-control col-sm-12" required>
+                                        <?php while ($project = mysqli_fetch_assoc($projects_result)): ?>
+                                            <option value="<?php echo $project['project_id']; ?>">
+                                                <?php echo $project['project_name']; ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+                            </div>
+        
                             <div class="form-group row">
                                 <label for="expenseamount" class="col-sm-6 col-form-label"><b>Enter Amount($)</b></label>
                                 <div class="col-md-6">
