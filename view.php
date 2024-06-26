@@ -6,11 +6,10 @@ $projects = mysqli_query($con, "SELECT * FROM projects WHERE user_id = '$userid'
 
 $project_id = isset($_POST['project_id']) ? $_POST['project_id'] : '';
 
-// Fetching expenses for the selected project
-
 $projects_query = "SELECT project_id, project_name FROM projects";
 $projects_result = mysqli_query($con, $projects_query);
 
+// Fetching expenses for the selected project
 $exp_fetched = [];
 if ($project_id) {
     $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'");
@@ -20,13 +19,12 @@ if ($project_id) {
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Expense Manager - Dashboard</title>
+    <title>Expense Manager - View Expenses</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +34,6 @@ if ($project_id) {
 
     <!-- Feather JS for Icons -->
     <script src="js/feather.min.js"></script>
-
 </head>
 
 <body>
@@ -55,10 +52,10 @@ if ($project_id) {
                 <a href="index.php" class="list-group-item list-group-item-action"><span data-feather="home"></span> Dashboard</a>
                 <a href="add_expense.php" class="list-group-item list-group-item-action"><span data-feather="plus-square"></span> Add Expenses</a>
                 <a href="view.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="eye"></span> View Expenses</a>
-                <a href="manage_expense.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="dollar-sign"></span> Manage Expenses</a>
+                <a href="manage_expense.php" class="list-group-item list-group-item-action"><span data-feather="dollar-sign"></span> Manage Expenses</a>
                 <a href="add_project.php" class="list-group-item list-group-item-action"><span data-feather="folder-plus"></span> Add Project</a>
             </div>
-            <div class="sidebar-heading">Settings </div>
+            <div class="sidebar-heading">Settings</div>
             <div class="list-group list-group-flush">
                 <a href="profile.php" class="list-group-item list-group-item-action"><span data-feather="user"></span> Profile</a>
                 <a href="logout.php" class="list-group-item list-group-item-action"><span data-feather="power"></span> Logout</a>
@@ -68,9 +65,7 @@ if ($project_id) {
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-
             <nav class="navbar navbar-expand-lg navbar-light border-bottom">
-
                 <button class="toggler" type="button" id="menu-toggle" aria-expanded="false">
                     <span data-feather="menu"></span>
                 </button>
@@ -93,11 +88,11 @@ if ($project_id) {
             </nav>
 
             <div class="container-fluid">
-                <h3 class="mt-4 text-center">Manage Expenses</h3>
+                <h3 class="mt-4 text-center">View Expenses</h3>
                 <hr>
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        <form method="POST" action="manage_expense.php">
+                        <form method="POST" action="view.php">
                             <div class="form-group">
                                 <label for="project_id">Select Project</label>
                                 <select class="form-control" id="project_id" name="project_id" onchange="this.form.submit()">
@@ -115,7 +110,6 @@ if ($project_id) {
                                     <th>Date</th>
                                     <th>Amount</th>
                                     <th>Expense Category</th>
-                                    <th colspan="2">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -128,17 +122,11 @@ if ($project_id) {
                                         <td><?php echo $row['expensedate']; ?></td>
                                         <td><?php echo 'Rs ' . $row['expense']; ?></td>
                                         <td><?php echo $row['expensecategory']; ?></td>
-                                        <td class="text-center">
-                                            <a href="add_expense.php?edit=<?php echo $row['expense_id']; ?>" class="btn btn-primary btn-sm" style="border-radius:0%;">Edit</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="add_expense.php?delete=<?php echo $row['expense_id']; ?>" class="btn btn-danger btn-sm" style="border-radius:0%;">Delete</a>
-                                        </td>
                                     </tr>
                                 <?php $count++;
                                 }
                             } else {
-                                echo '<tr><td colspan="6" class="text-center">Select a project to view expenses</td></tr>';
+                                echo '<tr><td colspan="4" class="text-center">Select a project to view expenses</td></tr>';
                             }
                             ?>
                             </tbody>

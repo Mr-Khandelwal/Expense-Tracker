@@ -55,6 +55,7 @@
       <div class="list-group list-group-flush">
         <a href="index.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="home"></span> Dashboard</a>
         <a href="add_expense.php" class="list-group-item list-group-item-action "><span data-feather="plus-square"></span> Add Expenses</a>
+        <a href="view.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="eye"></span> View Expenses</a>
         <a href="manage_expense.php" class="list-group-item list-group-item-action "><span data-feather="dollar-sign"></span> Manage Expenses</a>
         <a href="add_project.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="folder-plus"></span> Add Project</a>
 
@@ -111,7 +112,7 @@
                     </a>
                   </div>
                   <div class="col text-center">
-                    <a href="add_project.php"><img src="icon/search.png" width="57px" />
+                    <a href="view.php"><img src="icon/search.png" width="57px" />
                       <p>View Expense</p>
                     </a>
                   </div>
