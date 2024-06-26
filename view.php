@@ -2,19 +2,135 @@
 include("session.php");
 
 // Fetching projects
-$projects = mysqli_query($con, "SELECT * FROM projects WHERE user_id = '$userid'");
+$projects_query = "SELECT project_id, project_name, investment_limit FROM projects WHERE user_id = '$userid'";
+$projects_result = mysqli_query($con, $projects_query);
 
 $project_id = isset($_POST['project_id']) ? $_POST['project_id'] : '';
-
 $projects_query = "SELECT project_id, project_name FROM projects";
 $projects_result = mysqli_query($con, $projects_query);
 
-// Fetching expenses for the selected project
-$exp_fetched = [];
+// Initialize variables
+$total_expense = 0;
+$remaining_amount = 0;
+$project_name = '';
+$investment_limit = 0;
+
 if ($project_id) {
-    $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'");
+    // Fetching total expenses for the selected project
+    $total_expenses_query = "SELECT SUM(expense) AS total_expense FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'";
+    $total_expenses_result = mysqli_query($con, $total_expenses_query);
+    $total_expense_row = mysqli_fetch_assoc($total_expenses_result);
+    $total_expense = $total_expense_row['total_expense'] ?? 0;
+
+    // Fetching investment limit for the selected project
+    $investment_limit_query = "SELECT investment_limit FROM projects WHERE project_id = '$project_id'";
+    $investment_limit_result = mysqli_query($con, $investment_limit_query);
+    $investment_limit_row = mysqli_fetch_assoc($investment_limit_result);
+    $investment_limit = $investment_limit_row['investment_limit'] ?? 0;
+
+    $remaining_amount = $investment_limit - $total_expense;
+
+    // Fetching project name
+    $project_query = "SELECT project_name FROM projects WHERE project_id = '$project_id'";
+    $project_result = mysqli_query($con, $project_query);
+    $project_data = mysqli_fetch_assoc($project_result);
+    $project_name = $project_data['project_name'] ?? '';
+}
+
+// Fetching expenses for the selected project
+$expenses_query = "SELECT * FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'";
+$exp_fetched = mysqli_query($con, $expenses_query);
+
+// PDF generation logic
+if (isset($_POST['download_pdf'])) {
+    require_once('tcpdf/tcpdf.php'); // Include TCPDF library
+
+    class PDF extends TCPDF {
+        public function Header() {
+            // Header content goes here
+        }
+
+        public function Footer() {
+            // Footer content goes here
+        }
+    }
+
+    // Create new PDF document
+    $pdf = new PDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    // Set document information
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('Your Name');
+    $pdf->SetTitle('Project Expenses - '.$project_name);
+    $pdf->SetSubject('Project Expenses');
+    $pdf->SetKeywords('Expense, Project, PDF');
+
+    // Set default header data
+    $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, 'Project Expenses - '.$project_name, 'Generated on: '.date('Y-m-d H:i:s'));
+
+    // Set margins
+    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+    // Set auto page breaks
+    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+    // Add a page
+    $pdf->AddPage();
+
+    // Content
+    $pdf->SetFont('helvetica', '', 10);
+
+    // Table header
+    // $header = array('Date', 'Amount', 'Expense Category');
+    // $pdf->MultiCell(0, 10, 'Project Name: '.$project_name, 0, 'L');
+    // $pdf->Ln();
+    // $pdf->SetFont('', 'B');
+    // $pdf->Cell(40, 10, 'Date', 1, 0, 'C', 0);
+    // $pdf->Cell(40, 10, 'Amount', 1, 0, 'C', 0);
+    // $pdf->Cell(60, 10, 'Expense Category', 1, 1, 'C', 0);
+
+    // Print project name
+    $pdf->MultiCell(0, 10, 'Project Name: '.$project_name, 0, 'L');
+    $pdf->Ln();
+
+    // Table headers
+    $pdf->SetFont('', 'B');
+    $pdf->Cell(40, 10, 'Date', 1, 0, 'C');
+    $pdf->Cell(40, 10, 'Amount', 1, 0, 'C');
+    $pdf->Cell(60, 10, 'Expense Category', 1, 1, 'C');
+    $pdf->SetFont('', '');
+
+    // Table rows
+    // $pdf->SetFont('', '');
+    // $count = 1;
+    // while ($row = mysqli_fetch_array($exp_fetched)) {
+    //     $pdf->Cell(40, 10, $row['expensedate'], 1, 0, 'C', 0);
+    //     $pdf->Cell(40, 10, 'Rs '.$row['expense'], 1, 0, 'C', 0);
+    //     $pdf->Cell(60, 10, $row['expensecategory'], 1, 1, 'C', 0);
+    // }
+    while ($row = mysqli_fetch_assoc($exp_fetched)) {
+        $pdf->Cell(40, 10, $row['expensedate'], 1, 0, 'C');
+        $pdf->Cell(40, 10, 'Rs '.$row['expense'], 1, 0, 'C');
+        $pdf->Cell(60, 10, $row['expensecategory'], 1, 1, 'C');
+    }
+
+    // Summary section
+    $pdf->Ln();
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell(0, 10, 'Summary', 0, 1, 'L');
+    $pdf->SetFont('', '');
+    $pdf->Cell(0, 10, 'Investment Amount: Rs '.number_format($investment_limit, 2), 0, 1, 'L');
+    $pdf->Cell(0, 10, 'Total Expense: Rs '.number_format($total_expense, 2), 0, 1, 'L');
+    $pdf->Cell(0, 10, 'Remaining Amount: Rs '.number_format($investment_limit - $total_expense, 2), 0, 1, 'L');
+
+    // Close and output PDF document
+    $pdf->Output('project_expenses_'.$project_name.'.pdf', 'D');
+    exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -103,19 +219,31 @@ if ($project_id) {
                                 </select>
                             </div>
                         </form>
-                        <table class="table table-hover table-bordered">
-                            <thead>
-                                <tr class="text-center">
-                                    <th>#</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Expense Category</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-                            if ($project_id) {
+                        <?php if ($project_id) { ?>
+                            <div class="text-center">
+                                <div class="big-font-group">
+                                    <div class="big-font">Investment Amount : <?php echo number_format($investment_limit, 2); ?></div>
+                                    <div class="big-font">Total Expense : <?php echo number_format($total_expense, 2); ?></div>
+                                    <div class="big-font">Remaining Amount : <?php echo number_format($remaining_amount, 2); ?></div>
+                                </div>
+                                <form action="view.php" method="post" class="mt-4">
+                                    <input type="hidden" name="download_pdf" value="1">
+                                    <button type="submit" class="btn btn-primary">Download PDF</button>
+                                 </form>
+                            </div>
+                            <table class="table table-hover table-bordered mt-4">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>#</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Expense Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php
                                 $count = 1;
+                                mysqli_data_seek($exp_fetched, 0);
                                 while ($row = mysqli_fetch_array($exp_fetched)) { ?>
                                     <tr>
                                         <td><?php echo $count; ?></td>
@@ -125,37 +253,49 @@ if ($project_id) {
                                     </tr>
                                 <?php $count++;
                                 }
-                            } else {
-                                echo '<tr><td colspan="4" class="text-center">Select a project to view expenses</td></tr>';
-                            }
-                            ?>
-                            </tbody>
-                        </table>
+                                ?>
+                                </tbody>
+                            </table>
+                        <?php } else { ?>
+                            <div class="text-center">
+                                <p>Select a project to view expenses.</p>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
+
+            <style>
+                .big-font-group {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-bottom: 20px;
+                }
+                .big-font {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                }
+            </style>
+
+            <!-- /#page-content-wrapper -->
         </div>
-    </div>
-    <!-- /#page-content-wrapper -->
+        <!-- /#wrapper -->
 
-    </div>
-    <!-- /#wrapper -->
+        <!-- Bootstrap core JavaScript -->
+        <script src="js/jquery.slim.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/Chart.min.js"></script>
+        <!-- Menu Toggle Script -->
+        <script>
+            $("#menu-toggle").click(function(e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+        </script>
+        <script>
+            feather.replace()
+        </script>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="js/jquery.slim.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/Chart.min.js"></script>
-    <!-- Menu Toggle Script -->
-    <script>
-        $("#menu-toggle").click(function(e) {
-            e.preventDefault();
-            $("#wrapper").toggleClass("toggled");
-        });
-    </script>
-    <script>
-        feather.replace()
-    </script>
-
-</body>
+    </body>
 
 </html>
