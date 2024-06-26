@@ -188,6 +188,7 @@ if (isset($_GET['delete'])) {
                 <a href="index.php" class="list-group-item list-group-item-action"><span data-feather="home"></span> Dashboard</a>
                 <a href="add_expense.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="plus-square"></span> Add Expenses</a>
                 <a href="manage_expense.php" class="list-group-item list-group-item-action"><span data-feather="dollar-sign"></span> Manage Expenses</a>
+                <a href="add_project.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="folder-plus"></span> Add Project</a>
             </div>
             <div class="sidebar-heading">Settings </div>
             <div class="list-group list-group-flush">
@@ -248,7 +249,7 @@ if (isset($_GET['delete'])) {
                             </div>
         
                             <div class="form-group row">
-                                <label for="expenseamount" class="col-sm-6 col-form-label"><b>Enter Amount($)</b></label>
+                                <label for="expenseamount" class="col-sm-6 col-form-label"><b>Enter Amount(Rs)</b></label>
                                 <div class="col-md-6">
                                     <input type="number" class="form-control col-sm-12" value="<?php echo $expenseamount; ?>" id="expenseamount" name="expenseamount" required>
                                 </div>

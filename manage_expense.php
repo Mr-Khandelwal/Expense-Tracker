@@ -1,6 +1,20 @@
 <?php
 include("session.php");
-$exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$userid'");
+
+// Fetching projects
+$projects = mysqli_query($con, "SELECT * FROM projects WHERE user_id = '$userid'");
+
+$project_id = isset($_POST['project_id']) ? $_POST['project_id'] : '';
+
+// Fetching expenses for the selected project
+
+$projects_query = "SELECT project_id, project_name FROM projects";
+$projects_result = mysqli_query($con, $projects_query);
+
+$exp_fetched = [];
+if ($project_id) {
+    $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,13 +53,14 @@ $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$user
             <div class="sidebar-heading">Management</div>
             <div class="list-group list-group-flush">
                 <a href="index.php" class="list-group-item list-group-item-action"><span data-feather="home"></span> Dashboard</a>
-                <a href="add_expense.php" class="list-group-item list-group-item-action "><span data-feather="plus-square"></span> Add Expenses</a>
+                <a href="add_expense.php" class="list-group-item list-group-item-action"><span data-feather="plus-square"></span> Add Expenses</a>
                 <a href="manage_expense.php" class="list-group-item list-group-item-action sidebar-active"><span data-feather="dollar-sign"></span> Manage Expenses</a>
+                <a href="add_project.php" class="list-group-item list-group-item-action"><span data-feather="folder-plus"></span> Add Project</a>
             </div>
             <div class="sidebar-heading">Settings </div>
             <div class="list-group list-group-flush">
-                <a href="profile.php" class="list-group-item list-group-item-action "><span data-feather="user"></span> Profile</a>
-                <a href="logout.php" class="list-group-item list-group-item-action "><span data-feather="power"></span> Logout</a>
+                <a href="profile.php" class="list-group-item list-group-item-action"><span data-feather="user"></span> Profile</a>
+                <a href="logout.php" class="list-group-item list-group-item-action"><span data-feather="power"></span> Logout</a>
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -53,8 +68,7 @@ $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$user
         <!-- Page Content -->
         <div id="page-content-wrapper">
 
-            <nav class="navbar navbar-expand-lg navbar-light  border-bottom">
-
+            <nav class="navbar navbar-expand-lg navbar-light border-bottom">
 
                 <button class="toggler" type="button" id="menu-toggle" aria-expanded="false">
                     <span data-feather="menu"></span>
@@ -62,7 +76,6 @@ $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$user
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <img class="img img-fluid rounded-circle" src="<?php echo $userprofile ?>" width="25">
@@ -82,8 +95,18 @@ $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$user
                 <h3 class="mt-4 text-center">Manage Expenses</h3>
                 <hr>
                 <div class="row justify-content-center">
-
                     <div class="col-md-6">
+                        <form method="POST" action="manage_expense.php">
+                            <div class="form-group">
+                                <label for="project_id">Select Project</label>
+                                <select class="form-control" id="project_id" name="project_id" onchange="this.form.submit()">
+                                    <option value="">Select Project</option>
+                                    <?php while ($project = mysqli_fetch_array($projects_result)) { ?>
+                                        <option value="<?php echo $project['project_id']; ?>" <?php if ($project_id == $project['project_id']) echo 'selected'; ?>><?php echo $project['project_name']; ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </form>
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr class="text-center">
@@ -94,24 +117,32 @@ $exp_fetched = mysqli_query($con, "SELECT * FROM expenses WHERE user_id = '$user
                                     <th colspan="2">Action</th>
                                 </tr>
                             </thead>
-
-                            <?php $count=1; while ($row = mysqli_fetch_array($exp_fetched)) { ?>
-                                <tr>
-                                    <td><?php echo $count;?></td>
-                                    <td>$<?php echo $row['expensedate']; ?></td>
-                                    <td><?php echo '$'.$row['expense']; ?></td>
-                                    <td><?php echo $row['expensecategory']; ?></td>
-                                    <td class="text-center">
-                                        <a href="add_expense.php?edit=<?php echo $row['expense_id']; ?>" class="btn btn-primary btn-sm" style="border-radius:0%;">Edit</a>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="add_expense.php?delete=<?php echo $row['expense_id']; ?>" class="btn btn-danger btn-sm" style="border-radius:0%;">Delete</a>
-                                    </td>
-                                </tr>
-                            <?php $count++; } ?>
+                            <tbody>
+                            <?php
+                            if ($project_id) {
+                                $count = 1;
+                                while ($row = mysqli_fetch_array($exp_fetched)) { ?>
+                                    <tr>
+                                        <td><?php echo $count; ?></td>
+                                        <td><?php echo $row['expensedate']; ?></td>
+                                        <td><?php echo 'Rs ' . $row['expense']; ?></td>
+                                        <td><?php echo $row['expensecategory']; ?></td>
+                                        <td class="text-center">
+                                            <a href="add_expense.php?edit=<?php echo $row['expense_id']; ?>" class="btn btn-primary btn-sm" style="border-radius:0%;">Edit</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="add_expense.php?delete=<?php echo $row['expense_id']; ?>" class="btn btn-danger btn-sm" style="border-radius:0%;">Delete</a>
+                                        </td>
+                                    </tr>
+                                <?php $count++;
+                                }
+                            } else {
+                                echo '<tr><td colspan="6" class="text-center">Select a project to view expenses</td></tr>';
+                            }
+                            ?>
+                            </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
