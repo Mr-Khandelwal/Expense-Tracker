@@ -226,10 +226,10 @@ if (isset($_POST['download_pdf'])) {
                                     <div class="big-font">Total Expense : <?php echo number_format($total_expense, 2); ?></div>
                                     <div class="big-font">Remaining Amount : <?php echo number_format($remaining_amount, 2); ?></div>
                                 </div>
-                                <form action="view.php" method="post" class="mt-4">
+                                <!-- <form action="view.php" method="post" class="mt-4">
                                     <input type="hidden" name="download_pdf" value="1">
                                     <button type="submit" class="btn btn-primary">Download PDF</button>
-                                 </form>
+                                 </form> -->
                             </div>
                             <table class="table table-hover table-bordered mt-4">
                                 <thead>

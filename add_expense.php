@@ -216,10 +216,9 @@ if (isset($_GET['delete'])) {
                                 <img class="img img-fluid rounded-circle" src="<?php echo $userprofile ?>" width="25">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="profile.phcol-mdp">Your Profile</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="logout.php">Logout</a>
-                            </div>
+                <a class="dropdown-item" href="profile.php">Your Profile</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="logout.php">Logout</a>
                         </li>
                     </ul>
                 </div>
