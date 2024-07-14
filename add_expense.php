@@ -5,6 +5,7 @@ $del = false;
 $expenseamount = "";
 $expensedate = date("Y-m-d");
 $expensecategory = "Entertainment";
+$project_id = "";
 
 $projects_query = "SELECT project_id, project_name FROM projects";
 $projects_result = mysqli_query($con, $projects_query);
@@ -13,7 +14,8 @@ $projects_result = mysqli_query($con, $projects_query);
 if (isset($_POST['add'])) {
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
-    $expensecategory = $_POST['expensecategory'];
+    // $expensecategory = $_POST['expensecategory'];
+    $expensecategory = $_POST['expensecategory'] === 'Other' ? $_POST['expensecategory_other'] : $_POST['expensecategory'];
     $project_id = $_POST['project_id'];
 
     // Fetch the investment limit and current total expenses for the selected project
@@ -40,7 +42,8 @@ if (isset($_POST['update'])) {
     $id = $_GET['edit'];
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
-    $expensecategory = $_POST['expensecategory'];
+    // $expensecategory = $_POST['expensecategory'];
+    $expensecategory = $_POST['expensecategory'] === 'Other' ? $_POST['expensecategory_other'] : $_POST['expensecategory'];
     $project_id = $_POST['project_id'];
 
     $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory', project_id='$project_id' WHERE user_id='$userid' AND expense_id='$id'";
@@ -63,7 +66,6 @@ if (isset($_POST['delete'])) {
     header('location: manage_expense.php');
 }
 
-
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
     $update = true;
@@ -73,6 +75,11 @@ if (isset($_GET['edit'])) {
         $expenseamount = $n['expense'];
         $expensedate = $n['expensedate'];
         $expensecategory = $n['expensecategory'];
+        $project_id = $n['project_id'];
+        // if (!in_array($expensecategory, ['Entertainment', 'Food', 'Fuel', 'Travel'])) {
+        //     $expensecategory_other = $expensecategory;
+        //     $expensecategory = 'Other';
+        // }
     } else {
         echo ("WARNING: AUTHORIZATION ERROR: Trying to Access Unauthorized data");
     }
@@ -88,11 +95,17 @@ if (isset($_GET['delete'])) {
         $expenseamount = $n['expense'];
         $expensedate = $n['expensedate'];
         $expensecategory = $n['expensecategory'];
+        $project_id = $n['project_id'];
+        // if (!in_array($expensecategory, ['Entertainment', 'Food', 'Fuel', 'Travel'])) {
+        //     $expensecategory_other = $expensecategory;
+        //     $expensecategory = 'Other';
+        // }
     } else {
         echo ("WARNING: AUTHORIZATION ERROR: Trying to Access Unauthorized data");
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -179,19 +192,20 @@ if (isset($_GET['delete'])) {
                         <form action="" method="POST">
 
                         <!-- project fetchingg -->
-                            <div class="form-group row">
+                        <div class="form-group row">
                                 <label for="project_id" class="col-sm-6 col-form-label"><b>Select Project</b></label>
-                                <div class="col-md-6">
-                                    <select name="project_id" id="project_id" class="form-control col-sm-12" required>
-                                        <?php while ($project = mysqli_fetch_assoc($projects_result)): ?>
-                                            <option value="<?php echo $project['project_id']; ?>">
-                                                <?php echo $project['project_name']; ?>
+                                <div class="col-sm-12">
+                                    <select class="form-control" name="project_id" id="project_id" required>
+                                        <option value="">Select Project</option>
+                                        <?php while ($row = mysqli_fetch_array($projects_result)) : ?>
+                                            <option value="<?php echo $row['project_id']; ?>" <?php echo ($project_id == $row['project_id']) ? 'selected' : ''; ?>>
+                                                <?php echo $row['project_name']; ?>
                                             </option>
                                         <?php endwhile; ?>
                                     </select>
                                 </div>
                             </div>
-        
+
                             <div class="form-group row">
                                 <label for="expenseamount" class="col-sm-6 col-form-label"><b>Enter Amount(Rs)</b></label>
                                 <div class="col-md-6">
@@ -204,73 +218,41 @@ if (isset($_GET['delete'])) {
                                     <input type="date" class="form-control col-sm-12" value="<?php echo $expensedate; ?>" name="expensedate" id="expensedate" required>
                                 </div>
                             </div>
-                            <fieldset class="form-group">
-                                <div class="row">
-                                    <legend class="col-form-label col-sm-6 pt-0"><b>Category</b></legend>
-                                    <div class="col-md">
-
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory4" value="Medicine" <?php echo ($expensecategory == 'Medicine') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory4">
-                                                Medicine
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory3" value="Food" <?php echo ($expensecategory == 'Food') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory3">
-                                                Food
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory2" value="Bills & Recharges" <?php echo ($expensecategory == 'Bills & Recharges') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory2">
-                                                Bills and Recharges
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory1" value="Entertainment" <?php echo ($expensecategory == 'Entertainment') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory1">
-                                                Entertainment
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory7" value="Clothings" <?php echo ($expensecategory == 'Clothings') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory7">
-                                                Clothings
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory6" value="Rent" <?php echo ($expensecategory == 'Rent') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory6">
-                                                Rent
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory8" value="Household Items" <?php echo ($expensecategory == 'Household Items') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory8">
-                                                Household Items
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="expensecategory" id="expensecategory5" value="Others" <?php echo ($expensecategory == 'Others') ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="expensecategory5">
-                                                Others
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
                             <div class="form-group row">
-                                <div class="col-md-12 text-right">
-                                    <?php if ($update == true) : ?>
-                                        <button class="btn btn-lg btn-block btn-warning" style="border-radius: 0%;" type="submit" name="update">Update</button>
-                                    <?php elseif ($del == true) : ?>
-                                        <button class="btn btn-lg btn-block btn-danger" style="border-radius: 0%;" type="submit" name="delete">Delete</button>
-                                    <?php else : ?>
-                                        <button type="submit" name="add" class="btn btn-lg btn-block btn-success" style="border-radius: 0%;">Add Expense</button>
-                                    <?php endif ?>
+                                <label for="expensecategory" class="col-sm-6 col-form-label"><b>Expense Category</b></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="expensecategory" id="expensecategory" required onchange="toggleOtherCategory(this.value)">
+                                        <option value="">Select Category</option>
+                                        <option value="Entertainment" <?php echo ($expensecategory == 'Entertainment') ? 'selected' : ''; ?>>Entertainment</option>
+                                        <option value="Food" <?php echo ($expensecategory == 'Food') ? 'selected' : ''; ?>>Food</option>
+                                        <option value="Fuel" <?php echo ($expensecategory == 'Fuel') ? 'selected' : ''; ?>>Fuel</option>
+                                        <option value="Travel" <?php echo ($expensecategory == 'Travel') ? 'selected' : ''; ?>>Travel</option>
+                                        <option value="Other" <?php echo ($expensecategory == 'Other') ? 'selected' : ''; ?>>Other</option>
+                                    </select>
+                                    <input type="text" class="form-control mt-2" name="expensecategory_other" id="expensecategory_other" placeholder="Enter Category" style="display: none;" value="<?php echo ($expensecategory != 'Entertainment' && $expensecategory != 'Food' && $expensecategory != 'Fuel' && $expensecategory != 'Travel' && $expensecategory != '') ? $expensecategory : ''; ?>">
                                 </div>
+                            </div>                            
+                            <script>
+                                function toggleOtherCategory(value) {
+                                    if (value === "Other") {
+                                        document.getElementById('expensecategory_other').style.display = 'block';
+                                    } else {
+                                        document.getElementById('expensecategory_other').style.display = 'none';
+                                    }
+                                }
+                                window.onload = function () {
+                                    toggleOtherCategory(document.getElementById('expensecategory').value);
+                                };
+                            </script>
+
+                            <div class="form-group">
+                                <?php if ($update == true) : ?>
+                                    <button class="btn btn-success btn-block" type="submit" name="update">Update</button>
+                                <?php elseif ($del == true) : ?>
+                                    <button class="btn btn-danger btn-block" type="submit" name="delete">Delete</button>
+                                <?php else : ?>
+                                    <button class="btn btn-warning btn-block" type="submit" name="add">Add Expense</button>
+                                <?php endif ?>
                             </div>
                         </form>
                     </div>
