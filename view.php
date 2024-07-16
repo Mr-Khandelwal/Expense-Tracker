@@ -205,7 +205,7 @@ if (isset($_POST['download_pdf'])) {
                 <h3 class="mt-4 text-center">View Expenses</h3>
                 <hr>
                 <div class="row justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-md-9">
                         <form method="POST" action="view.php">
                             <div class="form-group">
                                 <label for="project_id">Select Project</label>
@@ -236,6 +236,11 @@ if (isset($_POST['download_pdf'])) {
                                         <th>Date</th>
                                         <th>Amount</th>
                                         <th>Expense Category</th>
+                                        <th>Expenditure for</th>
+                                        <th>Billed / Unbilled</th>
+                                        <th>Payment By</th>
+                                        <th>Payment Type</th>
+                                        <th>remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -248,6 +253,11 @@ if (isset($_POST['download_pdf'])) {
                                         <td><?php echo $row['expensedate']; ?></td>
                                         <td><?php echo 'Rs ' . $row['expense']; ?></td>
                                         <td><?php echo $row['expensecategory']; ?></td>
+                                        <td><?php echo $row['expenditurefor']; ?></td>
+                                        <td><?php echo $row['BillType']; ?></td>
+                                        <td><?php echo $row['PaymentBy']; ?></td>
+                                        <td><?php echo $row['PaymentType']; ?></td>
+                                        <td><?php echo $row['remarks']; ?></td>
                                     </tr>
                                 <?php $count++;
                                 }

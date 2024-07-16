@@ -94,7 +94,7 @@ if ($project_id) {
                 <h3 class="mt-4 text-center">Manage Expenses</h3>
                 <hr>
                 <div class="row justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-md-9">
                         <form method="POST" action="manage_expense.php">
                             <div class="form-group">
                                 <label for="project_id">Select Project</label>
@@ -113,6 +113,11 @@ if ($project_id) {
                                     <th>Date</th>
                                     <th>Amount</th>
                                     <th>Expense Category</th>
+                                    <th>Expenditure for</th>
+                                    <th>Billed / Unbilled</th>
+                                    <th>Payment By</th>
+                                    <th>Payment Type</th>
+                                    <th>remarks</th>
                                     <th colspan="2">Action</th>
                                 </tr>
                             </thead>
@@ -126,6 +131,11 @@ if ($project_id) {
                                         <td><?php echo $row['expensedate']; ?></td>
                                         <td><?php echo 'Rs ' . $row['expense']; ?></td>
                                         <td><?php echo $row['expensecategory']; ?></td>
+                                        <td><?php echo $row['expenditurefor']; ?></td>
+                                        <td><?php echo $row['BillType']; ?></td>
+                                        <td><?php echo $row['PaymentBy']; ?></td>
+                                        <td><?php echo $row['PaymentType']; ?></td>
+                                        <td><?php echo $row['remarks']; ?></td>
                                         <td class="text-center">
                                             <a href="add_expense.php?edit=<?php echo $row['expense_id']; ?>" class="btn btn-primary btn-sm" style="border-radius:0%;">Edit</a>
                                         </td>
@@ -136,7 +146,7 @@ if ($project_id) {
                                 <?php $count++;
                                 }
                             } else {
-                                echo '<tr><td colspan="6" class="text-center">Select a project to view expenses</td></tr>';
+                                echo '<tr><td colspan="9" class="text-center">Select a project to view expenses</td></tr>';
                             }
                             ?>
                             </tbody>

@@ -4,7 +4,12 @@ $update = false;
 $del = false;
 $expenseamount = "";
 $expensedate = date("Y-m-d");
-$expensecategory = "Entertainment";
+$expenditurefor="";
+$BillType ="";
+$PaymentBy ="";
+$PaymentType="Cash";
+$remarks="";
+$expensecategory = "";
 $project_id = "";
 
 $projects_query = "SELECT project_id, project_name FROM projects";
@@ -14,9 +19,14 @@ $projects_result = mysqli_query($con, $projects_query);
 if (isset($_POST['add'])) {
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
-    // $expensecategory = $_POST['expensecategory'];
-    $expensecategory = $_POST['expensecategory'] === 'Other' ? $_POST['expensecategory_other'] : $_POST['expensecategory'];
+    $expensecategory = $_POST['expensecategory'];
     $project_id = $_POST['project_id'];
+
+    $expenditurefor=$_POST['expenditurefor'];
+    $BillType =$_POST['BillType'];
+    $PaymentBy =$_POST['PaymentBy'];
+    $PaymentType =$_POST['PaymentType'];
+    $remarks==$_POST['remarks'];
 
     // Fetch the investment limit and current total expenses for the selected project
     $query = "SELECT investment_limit FROM projects WHERE project_id = $project_id";
@@ -30,7 +40,7 @@ if (isset($_POST['add'])) {
         echo "Error: Adding this expense would exceed the project's investment limit.";
     } else {
         // Insert the new expense into the database
-        $expenses = "INSERT INTO expenses (user_id, expense, expensedate, expensecategory, project_id) VALUES ('$userid', '$expenseamount', '$expensedate', '$expensecategory', '$project_id')";
+        $expenses = "INSERT INTO expenses (user_id, expense, expensedate, expensecategory, project_id,expenditurefor,BillType,PaymentBy,PaymentType,remarks) VALUES ('$userid', '$expenseamount', '$expensedate', '$expensecategory', '$project_id','$expenditurefor','$BillType','$PaymentBy','$PaymentType','$remarks')";
         $result = mysqli_query($con, $expenses) or die("Something Went Wrong!");
         header('location: add_expense.php');
     }
@@ -42,11 +52,16 @@ if (isset($_POST['update'])) {
     $id = $_GET['edit'];
     $expenseamount = $_POST['expenseamount'];
     $expensedate = $_POST['expensedate'];
-    // $expensecategory = $_POST['expensecategory'];
-    $expensecategory = $_POST['expensecategory'] === 'Other' ? $_POST['expensecategory_other'] : $_POST['expensecategory'];
-    $project_id = $_POST['project_id'];
+    $expensecategory = $_POST['expensecategory'];
+    $project_id = $_POST['project_id']; 
 
-    $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory', project_id='$project_id' WHERE user_id='$userid' AND expense_id='$id'";
+    $expenditurefor=$_POST['expenditurefor'];
+    $BillType =$_POST['BillType'];
+    $PaymentBy =$_POST['PaymentBy'];
+    $PaymentType =$_POST['PaymentType'];
+    $remarks==$_POST['remarks'];
+
+    $sql = "UPDATE expenses SET expense='$expenseamount', expensedate='$expensedate', expensecategory='$expensecategory', project_id='$project_id',expenditurefor ='$expenditurefor',BillType='$BillType',PaymentBy='$PaymentBy',PaymentType='$PaymentType',remarks='$remarks' WHERE user_id='$userid' AND expense_id='$id'";
     if (mysqli_query($con, $sql)) {
         echo "Records were updated successfully.";
     } else {
@@ -76,10 +91,13 @@ if (isset($_GET['edit'])) {
         $expensedate = $n['expensedate'];
         $expensecategory = $n['expensecategory'];
         $project_id = $n['project_id'];
-        // if (!in_array($expensecategory, ['Entertainment', 'Food', 'Fuel', 'Travel'])) {
-        //     $expensecategory_other = $expensecategory;
-        //     $expensecategory = 'Other';
-        // }
+    
+        $expenditurefor=$n['expenditurefor'];
+        $BillType =$n['BillType'];
+        $PaymentBy =$n['PaymentBy'];
+        $PaymentType =$n['PaymentType'];
+        $remarks==$n['remarks'];
+        
     } else {
         echo ("WARNING: AUTHORIZATION ERROR: Trying to Access Unauthorized data");
     }
@@ -96,10 +114,11 @@ if (isset($_GET['delete'])) {
         $expensedate = $n['expensedate'];
         $expensecategory = $n['expensecategory'];
         $project_id = $n['project_id'];
-        // if (!in_array($expensecategory, ['Entertainment', 'Food', 'Fuel', 'Travel'])) {
-        //     $expensecategory_other = $expensecategory;
-        //     $expensecategory = 'Other';
-        // }
+        $expenditurefor=$n['expenditurefor'];
+        $BillType =$n['BillType'];
+        $PaymentBy =$n['PaymentBy'];
+        $PaymentType =$n['PaymentType'];
+        $remarks==$n['remarks'];
     } else {
         echo ("WARNING: AUTHORIZATION ERROR: Trying to Access Unauthorized data");
     }
@@ -126,6 +145,7 @@ if (isset($_GET['delete'])) {
 
     <!-- Feather JS for Icons -->
     <script src="js/feather.min.js"></script>
+
 
 </head>
 
@@ -212,6 +232,7 @@ if (isset($_GET['delete'])) {
                                     <input type="number" class="form-control col-sm-12" value="<?php echo $expenseamount; ?>" id="expenseamount" name="expenseamount" required>
                                 </div>
                             </div>
+                            
                             <div class="form-group row">
                                 <label for="expensedate" class="col-sm-6 col-form-label"><b>Date</b></label>
                                 <div class="col-md-6">
@@ -223,16 +244,57 @@ if (isset($_GET['delete'])) {
                                 <div class="col-sm-6">
                                     <select class="form-control" name="expensecategory" id="expensecategory" required onchange="toggleOtherCategory(this.value)">
                                         <option value="">Select Category</option>
-                                        <option value="Entertainment" <?php echo ($expensecategory == 'Entertainment') ? 'selected' : ''; ?>>Entertainment</option>
+                                        <option value="Transport" <?php echo ($expensecategory == 'Transport') ? 'selected' : ''; ?>>Transport</option>
                                         <option value="Food" <?php echo ($expensecategory == 'Food') ? 'selected' : ''; ?>>Food</option>
-                                        <option value="Fuel" <?php echo ($expensecategory == 'Fuel') ? 'selected' : ''; ?>>Fuel</option>
-                                        <option value="Travel" <?php echo ($expensecategory == 'Travel') ? 'selected' : ''; ?>>Travel</option>
-                                        <option value="Other" <?php echo ($expensecategory == 'Other') ? 'selected' : ''; ?>>Other</option>
+                                        <option value="Accomodation" <?php echo ($expensecategory == 'Accomodation') ? 'selected' : ''; ?>>Accomodationl</option>
+                                        <option value="Misc" <?php echo ($expensecategory == 'Misc') ? 'selected' : ''; ?>>Miscellaneous</option>
                                     </select>
-                                    <input type="text" class="form-control mt-2" name="expensecategory_other" id="expensecategory_other" placeholder="Enter Category" style="display: none;" value="<?php echo ($expensecategory != 'Entertainment' && $expensecategory != 'Food' && $expensecategory != 'Fuel' && $expensecategory != 'Travel' && $expensecategory != '') ? $expensecategory : ''; ?>">
+                                    <!-- <input type="text" class="form-control mt-2" name="expensecategory_other" id="expensecategory_other" placeholder="Enter Category" style="display: none;" value="<?php echo ($expensecategory != 'Entertainment' && $expensecategory != 'Food' && $expensecategory != 'Fuel' && $expensecategory != 'Travel' && $expensecategory != '') ? $expensecategory : ''; ?>"> -->
                                 </div>
-                            </div>                            
-                            <script>
+                            </div>
+                            <div class="form-group row">
+                                <label for="expenditurefor" class="col-sm-6 col-form-label"><b>Expenditure For</b></label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control col-sm-12" value="<?php echo $expenditurefor; ?>" name="expenditurefor" id="expenditurefor" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="BillType" class="col-sm-6 col-form-label"><b>Bill / Unbilled</b></label>
+                                <div class="col-md-6">
+                                <select class="form-control" name="BillType" id="BillType" required onchange="toggleOtherCategory(this.value)">
+                                        <option value="UnBilled" <?php echo ($BillType == 'UnBilled') ? 'selected' : ''; ?>>UnBilled</option>
+                                        <option value="Billed" <?php echo ($BillType == 'Billed') ? 'selected' : ''; ?>>Billed</option>
+                                </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="PaymentBy" class="col-sm-6 col-form-label"><b>Payment By</b></label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control col-sm-12" value="<?php echo $PaymentBy; ?>" name="PaymentBy" id="PaymentBy" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="PaymentType" class="col-sm-6 col-form-label"><b>Payment Type</b></label>
+                                <div class="col-md-6">
+                                <select class="form-control" name="PaymentType" id="PaymentType" required onchange="toggleOtherCategory(this.value)">
+                                        <option value="Cash" <?php echo ($BillType == 'UnBilled') ? 'selected' : ''; ?>>Cash</option>
+                                        <option value="Online (UPI/ NetBanking)" <?php echo ($BillType == 'Billed') ? 'selected' : ''; ?>>Online (UPI/ NetBanking)</option>
+                                        <option value="Card" <?php echo ($BillType == 'Billed') ? 'selected' : ''; ?>>Card</option>
+                                </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="remarks" class="col-sm-6 col-form-label"><b>Remarks</b></label>
+                                <div class="col-md-6">
+                                    <input type="remarks" class="form-control col-sm-12" value="<?php echo $remarks; ?>" name="remarks" id="remarks" >
+                                </div>
+                            </div>
+                            
+                            <!-- <script>
                                 function toggleOtherCategory(value) {
                                     if (value === "Other") {
                                         document.getElementById('expensecategory_other').style.display = 'block';
@@ -243,7 +305,7 @@ if (isset($_GET['delete'])) {
                                 window.onload = function () {
                                     toggleOtherCategory(document.getElementById('expensecategory').value);
                                 };
-                            </script>
+                            </script> -->
 
                             <div class="form-group">
                                 <?php if ($update == true) : ?>
