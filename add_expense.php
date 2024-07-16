@@ -246,7 +246,7 @@ if (isset($_GET['delete'])) {
                                         <option value="">Select Category</option>
                                         <option value="Transport" <?php echo ($expensecategory == 'Transport') ? 'selected' : ''; ?>>Transport</option>
                                         <option value="Food" <?php echo ($expensecategory == 'Food') ? 'selected' : ''; ?>>Food</option>
-                                        <option value="Accomodation" <?php echo ($expensecategory == 'Accomodation') ? 'selected' : ''; ?>>Accomodationl</option>
+                                        <option value="Accomodation" <?php echo ($expensecategory == 'Accomodation') ? 'selected' : ''; ?>>Accomodation</option>
                                         <option value="Misc" <?php echo ($expensecategory == 'Misc') ? 'selected' : ''; ?>>Miscellaneous</option>
                                     </select>
                                     <!-- <input type="text" class="form-control mt-2" name="expensecategory_other" id="expensecategory_other" placeholder="Enter Category" style="display: none;" value="<?php echo ($expensecategory != 'Entertainment' && $expensecategory != 'Food' && $expensecategory != 'Fuel' && $expensecategory != 'Travel' && $expensecategory != '') ? $expensecategory : ''; ?>"> -->
