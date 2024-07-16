@@ -40,95 +40,6 @@ if ($project_id) {
 // Fetching expenses for the selected project
 $expenses_query = "SELECT * FROM expenses WHERE user_id = '$userid' AND project_id = '$project_id'";
 $exp_fetched = mysqli_query($con, $expenses_query);
-
-// PDF generation logic
-if (isset($_POST['download_pdf'])) {
-    require_once('tcpdf/tcpdf.php'); // Include TCPDF library
-
-    class PDF extends TCPDF {
-        public function Header() {
-            // Header content goes here
-        }
-
-        public function Footer() {
-            // Footer content goes here
-        }
-    }
-
-    // Create new PDF document
-    $pdf = new PDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-    // Set document information
-    $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetAuthor('Your Name');
-    $pdf->SetTitle('Project Expenses - '.$project_name);
-    $pdf->SetSubject('Project Expenses');
-    $pdf->SetKeywords('Expense, Project, PDF');
-
-    // Set default header data
-    $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, 'Project Expenses - '.$project_name, 'Generated on: '.date('Y-m-d H:i:s'));
-
-    // Set margins
-    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-
-    // Set auto page breaks
-    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-    // Add a page
-    $pdf->AddPage();
-
-    // Content
-    $pdf->SetFont('helvetica', '', 10);
-
-    // Table header
-    // $header = array('Date', 'Amount', 'Expense Category');
-    // $pdf->MultiCell(0, 10, 'Project Name: '.$project_name, 0, 'L');
-    // $pdf->Ln();
-    // $pdf->SetFont('', 'B');
-    // $pdf->Cell(40, 10, 'Date', 1, 0, 'C', 0);
-    // $pdf->Cell(40, 10, 'Amount', 1, 0, 'C', 0);
-    // $pdf->Cell(60, 10, 'Expense Category', 1, 1, 'C', 0);
-
-    // Print project name
-    $pdf->MultiCell(0, 10, 'Project Name: '.$project_name, 0, 'L');
-    $pdf->Ln();
-
-    // Table headers
-    $pdf->SetFont('', 'B');
-    $pdf->Cell(40, 10, 'Date', 1, 0, 'C');
-    $pdf->Cell(40, 10, 'Amount', 1, 0, 'C');
-    $pdf->Cell(60, 10, 'Expense Category', 1, 1, 'C');
-    $pdf->SetFont('', '');
-
-    // Table rows
-    // $pdf->SetFont('', '');
-    // $count = 1;
-    // while ($row = mysqli_fetch_array($exp_fetched)) {
-    //     $pdf->Cell(40, 10, $row['expensedate'], 1, 0, 'C', 0);
-    //     $pdf->Cell(40, 10, 'Rs '.$row['expense'], 1, 0, 'C', 0);
-    //     $pdf->Cell(60, 10, $row['expensecategory'], 1, 1, 'C', 0);
-    // }
-    while ($row = mysqli_fetch_assoc($exp_fetched)) {
-        $pdf->Cell(40, 10, $row['expensedate'], 1, 0, 'C');
-        $pdf->Cell(40, 10, 'Rs '.$row['expense'], 1, 0, 'C');
-        $pdf->Cell(60, 10, $row['expensecategory'], 1, 1, 'C');
-    }
-
-    // Summary section
-    $pdf->Ln();
-    $pdf->SetFont('helvetica', 'B', 12);
-    $pdf->Cell(0, 10, 'Summary', 0, 1, 'L');
-    $pdf->SetFont('', '');
-    $pdf->Cell(0, 10, 'Investment Amount: Rs '.number_format($investment_limit, 2), 0, 1, 'L');
-    $pdf->Cell(0, 10, 'Total Expense: Rs '.number_format($total_expense, 2), 0, 1, 'L');
-    $pdf->Cell(0, 10, 'Remaining Amount: Rs '.number_format($investment_limit - $total_expense, 2), 0, 1, 'L');
-
-    // Close and output PDF document
-    $pdf->Output('project_expenses_'.$project_name.'.pdf', 'D');
-    exit;
-}
 ?>
 
 <!DOCTYPE html>
@@ -218,7 +129,7 @@ if (isset($_POST['download_pdf'])) {
                             </div>
                         </form>
                         <?php if ($project_id) { ?>
-                            <div class="text-center">
+                            <div class="text-center"> 
                                 <div class="big-font-group">
                                     <div class="big-font">Investment Amount : <?php echo number_format($investment_limit, 2); ?></div>
                                     <div class="big-font">Total Expense : <?php echo number_format($total_expense, 2); ?></div>
@@ -264,6 +175,24 @@ if (isset($_POST['download_pdf'])) {
                                 ?>
                                 </tbody>
                             </table>
+                            <!-- <div class ="btns leftAlign">
+                            <a href ="export.php" ><button type ="button" style = "position:absolute;  left:850px;" class ="btn btn-primary">Export</button></a>
+                            </div> -->
+                            <!-- <form method="POST" action="export.php">
+                            <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                            <button type="submit" class="btn btn-primary">Export</button>
+                            </form> -->
+                            <div class="btns leftAlign">
+                            <form method="POST" action="export_handler.php" style="display: inline;">
+                                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                <select name="export_format" class="form-control" style="width: auto; display: inline;">
+                                    <option value="excel">Export as Excel</option>
+                                    <option value="pdf">Export as PDF</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="position:absolute;  left:850px;">Export</button>
+                            </form>
+                        </div>
+
                         <?php } else { ?>
                             <div class="text-center">
                                 <p>Select a project to view expenses.</p>
